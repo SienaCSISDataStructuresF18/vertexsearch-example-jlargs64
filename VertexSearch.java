@@ -14,28 +14,29 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class VertexSearch {
-    
+public class VertexSearch { //class header
+
     /**
      * main method to run our search
      * 
      * @param args args[0] is the name of the file to read in
      */
     public static void main(String args[]) {
-        
+        //static - means it doesnt access any instance variables
+
         // we'll start with a check to make sure there's a file name
         // provided on the command line
         if (args.length != 1) {
             // System.err is like System.out, except it's used for error messages
             // rather than normal output.
             System.err.println("Usage: java VertexSearch filename");
-            
+
             // System.exit kills the program, and its parameter indicates an error
             // code. A code of 0 means successful completion, and other numbers 
             // indicate problems caused an unsuccessful exit.  We'll use 1.
             System.exit(1);
         }
-        
+
         // A try-catch block will deal with errors opening and closing our file.
         // We will need to declare any variables we need both inside the block and
         // once we continue below before the block.  Further, if they are initialized
@@ -43,13 +44,14 @@ public class VertexSearch {
         // from Java about potentially using variables that have not been given an
         // initial value.
         int numVertices = 0, numEdges = 0;
+        Waypoint points[] = {};
         try {
             Scanner inFile = new Scanner(new File(args[0]));
-            
+
             // the first line of the file is a version number, which for now
             // we can ignore
             inFile.nextLine();
-            
+
             // the second line is two numbers: the number of vertices and the
             // number of edges that follow
             //
@@ -57,7 +59,9 @@ public class VertexSearch {
             // both anyway for later
             numVertices = inFile.nextInt();
             numEdges = inFile.nextInt();
-            
+
+            // construct our array of waypoints
+            points = new Waypoint[numVertices];
             // the next numVertices lines each have a string (a vertex label)
             // followed by two numbers (the latitude and the longitude of the
             // vertex), so a counting loop can work here
@@ -65,8 +69,10 @@ public class VertexSearch {
                 String label = inFile.next();
                 double lat = inFile.nextDouble();
                 double lng = inFile.nextDouble();
+                Waypoint w = new Waypoint(label, lat, lng);
+                points[vertexNum] = w;
             }
-            
+
             inFile.close();
         }
         catch (IOException e) {
@@ -75,9 +81,45 @@ public class VertexSearch {
             System.err.println(e);
             System.exit(1);
         }
-        
+
         System.out.println("Successfully read in " + numVertices + " vertex entries.");
         System.out.println("Ignored " + numEdges + " edge entries.");
+
+        // variables to track our four leaders
+        Waypoint north, south, east, west;
+
+        north = points[0];
+        south = points[0];
+        east = points[0];
+        west = points[0];
+
+        for(int check = 1; check < points.length; check++){
+
+            //is points[check] further north than "north"
+            if(points[check].getLat() > north.getLat() ){
+                north = points[check];
+            }
+
+            //is points[check] further south than "south"
+            if(points[check].getLat() < south.getLat() ){
+                south = points[check];
+            }
+
+            //is points[check] further west than "west"
+            if(points[check].getLng() < west.getLng() ){
+                west = points[check];
+            }
+
+            //is points[check] further east than "east"
+            if(points[check].getLng() > east.getLng() ){
+                east = points[check];
+            }
+        }
+
+        System.out.println("Northernmost: " + north.toString());
+        System.out.println("Southernmost: " + south.toString());
+        System.out.println("Westernmost: " + west.toString());
+        System.out.println("Easternmost: " + east.toString());
     }
 
 }
